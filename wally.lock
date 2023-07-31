@@ -5,9 +5,14 @@ registry = "test"
 [[package]]
 name = "chave/squidwardminigame"
 version = "0.1.0"
-dependencies = [["promise", "evaera/promise@4.0.0"]]
+dependencies = [["promise", "evaera/promise@4.0.0"], ["signal", "si-senortn/signal@0.1.0"]]
 
 [[package]]
 name = "evaera/promise"
 version = "4.0.0"
+dependencies = []
+
+[[package]]
+name = "si-senortn/signal"
+version = "0.1.0"
 dependencies = []
