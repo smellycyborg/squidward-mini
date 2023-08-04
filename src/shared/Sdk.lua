@@ -102,6 +102,25 @@ local function onPrompButtonHoldEnded(prompt, player)
     end
 end
 
+local function onHeartbeat(deltaTime)
+    timeElapsed += deltaTime
+
+    if not isFindingPaths then
+        isFindingPaths = true
+
+        for _, squidward in ipairs(Sdk.squidwardInstances) do
+            local hasSpawned = squidward:getWorkspaceModel()
+            if not hasSpawned then
+                continue
+            end
+            
+            squidward:findPath()
+        end
+
+        isFindingPaths = false
+    end
+end
+
 function Sdk.init()
     updateCountdownUi = serverComm:CreateSignal("UpdateCountdownUi")
     updateBurgersUi = serverComm:CreateSignal("UpdateBurgersUi")
@@ -119,7 +138,7 @@ function Sdk.init()
     Players.PlayerAdded:Connect(onPlayerAdded)
     Players.PlayerRemoving:Connect(onPlayerRemoving)
     ProximityPromptService.PromptButtonHoldEnded:Connect(onPrompButtonHoldEnded)
-
+    RunService.Heartbeat:Connect(onHeartbeat)
 end
 
 function Sdk:changeGameState(newState)
