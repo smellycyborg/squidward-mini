@@ -22,6 +22,9 @@ local RESOLVE_MESSAGE = "You have filled up your burgers.  Throw them at squidwa
 
 local roundTimeLeft = ROUND_TIME
 local intermissionTimeLeft = INTERMISSION_TIME
+local timeElapsed = 0
+
+local isFindingPaths = false
 
 local Sdk = {
     gameState = "START",
@@ -60,7 +63,19 @@ local function onTimerTick()
         roundTimeLeft -= 1
         updateCountdownUi:FireAll(roundTimeLeft)
 
-        -- Todo spawn squidwards, have squidwards track player position
+        local function onSquidwardHealthChanged()
+        end
+
+        local function onSquidwardHasDied()
+        end
+
+        local newSquidward = Squidward.new()
+        newSquidward.healthChanged:Connect(onSquidwardHealthChanged)
+        newSquidward.hasDied:Connect(onSquidwardHasDied)
+        
+        table.insert(Sdk.squidwardInstances, newSquidward)
+
+        newSquidward:spawn()
 
         if roundTimeLeft <= 0 then
             Sdk:changeGameState("INTERMISSION")
