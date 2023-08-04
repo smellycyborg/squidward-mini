@@ -5,6 +5,7 @@ local ProximityPromptService = game:GetService("ProximityPromptService")
 
 local Common = ReplicatedStorage.Common
 local Packages = ReplicatedStorage.Packages
+local Items = ReplicatedStorage.Items
 
 local Squidward = require(Common.SquidwardClass)
 local Timer = require(Packages.timer)
@@ -19,8 +20,9 @@ local TIMER_INTERVAL = 1
 local MAX_BURGERS = 6
 local KILLS_TO_ACTIVATE_NEXT_WAVE = 4
 local MAX_SQUIDWARDS = 6
-local REJECT_MESSAGE = "You has max burgers.  Try throwing some!"
-local RESOLVE_MESSAGE = "You have filled up your burgers.  Throw them at squidward or eat them for health!"
+local MAX_BURGERS_MESSAGE = "You has max burgers.  Try throwing some!"
+local FILLED_BURGERS_MESSAGE = "You have filled up your burgers.  Throw them at squidward or eat them for health!"
+local NO_BURGERS_MESSAGE = "You have no more burgers.  Go to the stove and get more!"
 
 local roundTimeLeft = ROUND_TIME
 local intermissionTimeLeft = INTERMISSION_TIME
@@ -31,6 +33,8 @@ local noMoreSquidwards = false
 
 local burgersPerPlayer = {}
 local statePerPlayer = {}
+
+local burgerModel = Items.Burger
 
 local Sdk = {
     gameWave = 1,
@@ -123,12 +127,12 @@ local function onPrompButtonHoldEnded(prompt, player)
         local function givePlayerBurgersPromise()   
             return Promise.new(function(resolve, reject, onCancel)
                 if playerBurgers >= MAX_BURGERS then
-                    reject(REJECT_MESSAGE)
+                    reject(MAX_BURGERS_MESSAGE)
                 elseif playerBurgers < MAX_BURGERS then
         
                     burgersPerPlayer[player] = 6
         
-                    resolve(RESOLVE_MESSAGE)
+                    resolve(FILLED_BURGERS_MESSAGE)
                 end
             end)
         end
@@ -167,10 +171,40 @@ local function onHeartbeat(deltaTime)
     end
 end
 
+local function onThrowBurger(player)
+    local playerBurgers = burgersPerPlayer[player]
+
+    if playerBurgers <= 0 then
+        sendNotifictionToPlayer:Fire(player, NO_BURGERS_MESSAGE)
+
+        return
+    end
+
+    local character = player.Character
+    if not character then
+        return
+    end
+
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+    if not humanoidRootPart then
+        return
+    end
+
+    local characterPosition = humanoidRootPart.Position
+
+    local burgerClone = burgerModel:Clone()
+    burgerClone.Position = characterPosition
+    burgerClone.Parent = workspace.Burgers
+
+    playerBurgers -= 1
+    updateBurgersUi:Fire(player, playerBurgers)
+end
+
 function Sdk.init()
     updateCountdownUi = serverComm:CreateSignal("UpdateCountdownUi")
     updateBurgersUi = serverComm:CreateSignal("UpdateBurgersUi")
     sendNotifictionToPlayer = serverComm:CreateSignal("SendNotificationToPlayer")
+    local throwBurger = serverComm:CreateSignal("ThrowBurger")
 
     local timer = Timer.new(TIMER_INTERVAL)
     timer.Tick:Connect(onTimerTick)
@@ -186,6 +220,7 @@ function Sdk.init()
     Players.PlayerRemoving:Connect(onPlayerRemoving)
     ProximityPromptService.PromptTriggered:Connect(onPrompButtonHoldEnded)
     RunService.Heartbeat:Connect(onHeartbeat)
+    throwBurger:Connect(onThrowBurger)
 end
 
 function Sdk:changeGameState(newState)

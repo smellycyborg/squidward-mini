@@ -13,6 +13,7 @@ local clientComm = Comm.ClientComm.new(ReplicatedStorage, false, "MainComm")
 local updateCountdownUi = clientComm:GetSignal("UpdateCountdownUi")
 local updateBurgersUi = clientComm:GetSignal("UpdateBurgersUi")
 local sendNotifictionToPlayer = clientComm:GetSignal("SendNotificationToPlayer")
+local throwBurger = clientComm:GetSignal("ThrowBurger")
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
@@ -29,6 +30,7 @@ local view = Roact.createElement(MainContainer, {
     burgersLeft = burgersLeft,
     notificationMessage = notificationMessage,
     gameState = gameState,
+    throwBurger = throwBurger,
 })
 
 local function updateHandle()
@@ -37,6 +39,7 @@ local function updateHandle()
         burgersLeft = burgersLeft,
         notificationMessage = notificationMessage,
         gameState = gameState,
+        throwBurger = throwBurger,
     }), playerGui, "MainContainer")
 end
 

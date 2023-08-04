@@ -8,6 +8,7 @@ local Roact = require(Packages.roact)
 local Countdown = require(RoactComponents.Countdown)
 local Burgers = require(RoactComponents.Burgers)
 local Notification = require(RoactComponents.Notification)
+local BurgerButton = require(RoactComponents.BurgerButton)
 
 local MainContainer = Roact.Component:extend("MainContainer")
 
@@ -22,6 +23,8 @@ function MainContainer:render()
     local burgersLeft = self.props.burgersLeft
     local notificationMessage = self.props.notificationMessage
     local gameState = self.props.gameState
+
+    local onBurgerButtonActivated = self.onBurgerButtonActivated
 
     return Roact.createElement("ScreenGui", {
         ResetOnSpawn = false,
@@ -43,6 +46,9 @@ function MainContainer:render()
             Notification = Roact.createElement(Notification, {
                 notificationMessage = notificationMessage,
             }),
+            BurgerButton = Roact.createElement(BurgerButton, {
+                onBurgerButtonActivated = onBurgerButtonActivated,
+            })
        })
     })
 end
