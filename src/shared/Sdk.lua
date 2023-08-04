@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
+local ProximityPromptService = game:GetService("ProximityPromptService")
 
 local Common = ReplicatedStorage.Common
 local Packages = ReplicatedStorage.Packages
@@ -8,6 +9,7 @@ local Packages = ReplicatedStorage.Packages
 local Squidward = require(Common.SquidwardClass)
 local Timer = require(Packages.timer)
 local Comm = require(Packages.Comm)
+local Promise = require(Packages.promise)
 
 local serverComm = Comm.ServerComm.new(ReplicatedStorage, "MainComm")
 
@@ -68,6 +70,35 @@ local function onTimerTick()
     end
 end
 
+local function onPrompButtonHoldEnded(prompt, player)
+    local isBurgersPrompt = prompt.Parent.Name == "BurgersPrompt"
+    if isBurgersPrompt then
+        local function addBurgersToPlayerPromise()
+            return Promise.new(function(resolve, reject, onCancel)
+                local playerBurgers = Sdk.burgersPerPlayer[player]
+
+                if playerBurgers >= MAX_BURGERS then
+                    reject(REJECT_MESSAGE)
+                elseif playerBurgers < MAX_BURGERS then
+                    resolve(RESOLVE_MESSAGE)
+                end
+            end)
+        end
+
+        local function onReject(message)
+            sendNotifictionToPlayer:Fire(player, message)
+        end
+        
+        local function onResolve(message)
+            sendNotifictionToPlayer:Fire(player, message)
+        end
+
+        addBurgersToPlayerPromise()
+        :andThen(onResolve)
+        :catch(onReject)
+    end
+end
+
 function Sdk.init()
     updateCountdownUi = serverComm:CreateSignal("UpdateCountdownUi")
 
@@ -79,6 +110,8 @@ function Sdk.init()
     end
     Players.PlayerAdded:Connect(onPlayerAdded)
     Players.PlayerRemoving:Connect(onPlayerRemoving)
+    ProximityPromptService.PromptButtonHoldEnded:Connect(onPrompButtonHoldEnded)
+
 end
 
 function Sdk:changeGameState(newState)
