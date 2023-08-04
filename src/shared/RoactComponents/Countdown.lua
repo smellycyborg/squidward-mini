@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Packages = ReplicatedStorage.Packages
 
-local Roact = require(Packages.ReplicatedStorage)
+local Roact = require(Packages.roact)
 
 local COUNTDOWN_MESSAGE = "Countdown:  "
 

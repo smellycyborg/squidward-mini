@@ -4,7 +4,7 @@ local Packages = ReplicatedStorage.Packages
 local Common = ReplicatedStorage.Common
 local RoactComponents = Common.RoactComponents
 
-local Roact = require(Packages.ReplicatedStorage)
+local Roact = require(Packages.roact)
 local Countdown = require(RoactComponents.Countdown)
 local Burgers = require(RoactComponents.Burgers)
 local Notification = require(RoactComponents.Notification)
