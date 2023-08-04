@@ -13,10 +13,12 @@ local Promise = require(Packages.promise)
 
 local serverComm = Comm.ServerComm.new(ReplicatedStorage, "MainComm")
 
-local ROUND_TIME = 60
-local INTERMISSION_TIME = 15
+local ROUND_TIME = 6
+local INTERMISSION_TIME = 2
 local TIMER_INTERVAL = 1
 local MAX_BURGERS = 5
+local KILLS_TO_ACTIVATE_NEXT_WAVE = 4
+local MAX_SQUIDWARDS = 6
 local REJECT_MESSAGE = "You has max burgers.  Try throwing some!"
 local RESOLVE_MESSAGE = "You have filled up your burgers.  Throw them at squidward or eat them for health!"
 
@@ -25,10 +27,12 @@ local intermissionTimeLeft = INTERMISSION_TIME
 local timeElapsed = 0
 
 local isFindingPaths = false
+local noMoreSquidwards = false
 
 local Sdk = {
-    gameState = "START",
     gameWave = 1,
+    killsDuringRound = 0,
+    gameState = "INTERMISSION",
     squidwardInstances = {},
     statePerPlayer = {},
     burgersPerPlayer = {},
@@ -46,27 +50,49 @@ end
 
 local function onTimerTick()
     local gameState = Sdk.gameState
-    local squidwards = Sdk.squidwardInstances
+    local killsDuringRound = Sdk.killsDuringRound
+
+    print("Timer:  The game state is current " .. gameState .. ".")
 
     local isIntermission = gameState == "INTERMISSION"
-    local isRoundInProgress = gameState == "ROUND_IN_PROGRESS"
+    local isRoundInProgress = gameState == "ROUND_IN_PROGESS"
+
+    if killsDuringRound >= KILLS_TO_ACTIVATE_NEXT_WAVE then
+        noMoreSquidwards = true
+    end
+
+    if noMoreSquidwards and Sdk.gameState ~= "INTERMISSION" then
+        Sdk:changeGameState("INTERMISSION")
+
+        noMoreSquidwards = false
+
+        -- Todo something for saying player has won the current wave or game
+    end
 
     if isIntermission then
         intermissionTimeLeft -= 1
-        updateCountdownUi:FireAll(intermissionTimeLeft)
+        updateCountdownUi:FireAll(intermissionTimeLeft, gameState)
 
         if intermissionTimeLeft <= 0 then
             Sdk:changeGameState("ROUND_IN_PROGESS")
             intermissionTimeLeft = INTERMISSION_TIME
         end
+
     elseif isRoundInProgress then
         roundTimeLeft -= 1
-        updateCountdownUi:FireAll(roundTimeLeft)
+        updateCountdownUi:FireAll(roundTimeLeft, gameState)
+
+        local workspaceSquidswardsFolder = workspace.Squidwards
+        local squidwardsInTheWorkspace = #workspaceSquidswardsFolder:GetChildren()
+        if squidwardsInTheWorkspace >= MAX_SQUIDWARDS then
+            return 
+        end
 
         local function onSquidwardHealthChanged()
         end
 
         local function onSquidwardHasDied()
+            Sdk:addToKills()
         end
 
         local newSquidward = Squidward.new()
@@ -80,11 +106,11 @@ local function onTimerTick()
         if roundTimeLeft <= 0 then
             Sdk:changeGameState("INTERMISSION")
             roundTimeLeft = ROUND_TIME
-        end
-    end
 
-    if #squidwards <= 0 and Sdk.gameState ~= "INTERMISSION" then
-        Sdk:changeGameState("INTERMISSION")
+            Sdk:clearSquidwardInstances()
+
+            -- Todo something for saying player has lost the game
+        end
     end
 end
 
