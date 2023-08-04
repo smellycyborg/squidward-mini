@@ -20,6 +20,7 @@ local playerGui = player:WaitForChild("PlayerGui")
 local countdownTime = 0
 local burgersLeft = 0
 local notificationMessage = ""
+local gameState = ""
 
 local handle
 
@@ -27,6 +28,7 @@ local view = Roact.createElement(MainContainer, {
     countdownTime = countdownTime,
     burgersLeft = burgersLeft,
     notificationMessage = notificationMessage,
+    gameState = gameState,
 })
 
 local function updateHandle()
@@ -34,13 +36,15 @@ local function updateHandle()
         countdownTime = countdownTime,
         burgersLeft = burgersLeft,
         notificationMessage = notificationMessage,
+        gameState = gameState,
     }), playerGui, "MainContainer")
 end
 
 handle = Roact.mount(view, playerGui, "MainContainer")
 
-local function onUpdateCountdownUi(timeLeft)
+local function onUpdateCountdownUi(timeLeft, newState)
     countdownTime = timeLeft
+    gameState = newState
 
     updateHandle()
 

@@ -15,6 +15,7 @@ function MainContainer:render()
     local countdownTime = self.props.countdownTime
     local burgersLeft = self.props.burgersLeft
     local notificationMessage = self.props.notificationMessage
+    local gameState = self.props.gameState
 
     return Roact.createElement("ScreenGui", {
         ResetOnSpawn = false,
@@ -28,6 +29,7 @@ function MainContainer:render()
        }, {
             Countdown = Roact.createElement(Countdown, {
                 countdownTime = countdownTime,
+                gameState = gameState,
             }),
             Burgers = Roact.createElement(Burgers, {
                 burgersLeft = burgersLeft,

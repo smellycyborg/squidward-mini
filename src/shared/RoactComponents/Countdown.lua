@@ -4,12 +4,11 @@ local Packages = ReplicatedStorage.Packages
 
 local Roact = require(Packages.roact)
 
-local COUNTDOWN_MESSAGE = "Countdown:  "
-
 return function(props)
     local countdownTime = props.countdownTime
+    local gameState = props.gameState
 
-    local text = COUNTDOWN_MESSAGE .. countdownTime
+    local text = gameState .. " : " .. countdownTime
 
     return Roact.createElement("TextLabel", {
         AnchorPoint = Vector2.new(0.5, 0.5),
