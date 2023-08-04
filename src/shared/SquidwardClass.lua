@@ -37,7 +37,7 @@ local function _getClosestCharacter(modelPosition)
 
         local characterPosition = humanoidRootPart.Position
 
-        local distanceBetweenZombieAndPlayer = (zombiePosition - characterPosition).Magnitude
+        local distanceBetweenZombieAndPlayer = (modelPosition - characterPosition).Magnitude
         distances[character] = distanceBetweenZombieAndPlayer
 	end
 
@@ -56,25 +56,25 @@ local function _getClosestCharacter(modelPosition)
 end
 
 function squidward.new()
-    local self = {}
+    local instance = {}
     local private = {}
 
-    self.healthChanged = Signal.new()
-    self.hasDied = Signal.new()
+    instance.healthChanged = Signal.Fast.new()
+    instance.hasDied = Signal.Fast.new()
 
     private.health = 100
     private.workspaceModel = nil
 
-    squidwardPrivate[self] = private
+    squidwardPrivate[instance] = private
 
-    return setmetatable(self, squidwardPrototype)
+    return setmetatable(instance, squidwardPrototype)
 end
 
 function squidwardPrototype:spawn()
     local private = squidwardPrivate[self]
 
     local squidwardClone = SquidwardModel:Clone()
-    squidwardClone.Parent = workspace
+    squidwardClone.Parent = workspace.Squidwards
 
     private.workspaceModel = squidwardClone
 end
@@ -83,8 +83,17 @@ function squidwardPrototype:findPath()
     local private = squidwardPrivate[self]
 
     local workspaceModel = private.workspaceModel
-    local modelPosition = workspaceModel.Position
+    local modelPrimaryPart = workspaceModel.PrimaryPart
+    if not modelPrimaryPart then
+        return
+    end
+
+    local modelPosition = modelPrimaryPart.Position
+
     local closestCharacter = _getClosestCharacter(modelPosition)
+    if not closestCharacter then
+        return
+    end
     local closestCharacterRootPart = closestCharacter:FindFirstChild("HumanoidRootPart")
     if not closestCharacterRootPart then
         return warn("Attempt to index nil with root part.")
