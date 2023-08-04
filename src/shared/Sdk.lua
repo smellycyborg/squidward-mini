@@ -16,6 +16,9 @@ local serverComm = Comm.ServerComm.new(ReplicatedStorage, "MainComm")
 local ROUND_TIME = 60
 local INTERMISSION_TIME = 15
 local TIMER_INTERVAL = 1
+local MAX_BURGERS = 5
+local REJECT_MESSAGE = "You has max burgers.  Try throwing some!"
+local RESOLVE_MESSAGE = "You have filled up your burgers.  Throw them at squidward or eat them for health!"
 
 local roundTimeLeft = ROUND_TIME
 local intermissionTimeLeft = INTERMISSION_TIME
