@@ -196,8 +196,8 @@ local function onThrowBurger(player)
     burgerClone.Position = characterPosition
     burgerClone.Parent = workspace.Burgers
 
-    playerBurgers -= 1
-    updateBurgersUi:Fire(player, playerBurgers)
+    burgersPerPlayer[player] -= 1
+    updateBurgersUi:Fire(player, burgersPerPlayer[player])
 end
 
 function Sdk.init()

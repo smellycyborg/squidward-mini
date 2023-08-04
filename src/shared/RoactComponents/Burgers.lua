@@ -10,7 +10,7 @@ return function(props)
     return Roact.createElement("TextLabel", {
         AnchorPoint = Vector2.new(0, 0.5),
         BackgroundTransparency = 1,
-        Position = UDim2.fromScale(0, 0.5),
+        Position = UDim2.fromScale(0, 0.4),
         Size = UDim2.fromScale(0.1, 0.1),
         Text = burgersLeft,
         TextScaled = true,
