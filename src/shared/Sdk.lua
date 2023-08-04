@@ -20,6 +20,7 @@ local TIMER_INTERVAL = 1
 local MAX_BURGERS = 6
 local KILLS_TO_ACTIVATE_NEXT_WAVE = 4
 local MAX_SQUIDWARDS = 6
+local TIME_TO_DESTROY_BURGER = 3
 local MAX_BURGERS_MESSAGE = "You has max burgers.  Try throwing some!"
 local FILLED_BURGERS_MESSAGE = "You have filled up your burgers.  Throw them at squidward or eat them for health!"
 local NO_BURGERS_MESSAGE = "You have no more burgers.  Go to the stove and get more!"
@@ -198,6 +199,10 @@ local function onThrowBurger(player)
 
     burgersPerPlayer[player] -= 1
     updateBurgersUi:Fire(player, burgersPerPlayer[player])
+
+    task.delay(TIME_TO_DESTROY_BURGER, function()
+        burgerClone:Destroy()
+    end)
 end
 
 function Sdk.init()
