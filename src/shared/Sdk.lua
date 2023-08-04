@@ -16,7 +16,7 @@ local serverComm = Comm.ServerComm.new(ReplicatedStorage, "MainComm")
 local ROUND_TIME = 6
 local INTERMISSION_TIME = 2
 local TIMER_INTERVAL = 1
-local MAX_BURGERS = 5
+local MAX_BURGERS = 6
 local KILLS_TO_ACTIVATE_NEXT_WAVE = 4
 local MAX_SQUIDWARDS = 6
 local REJECT_MESSAGE = "You has max burgers.  Try throwing some!"
@@ -29,30 +29,29 @@ local timeElapsed = 0
 local isFindingPaths = false
 local noMoreSquidwards = false
 
+local burgersPerPlayer = {}
+local statePerPlayer = {}
+
 local Sdk = {
     gameWave = 1,
     killsDuringRound = 0,
     gameState = "INTERMISSION",
     squidwardInstances = {},
-    statePerPlayer = {},
-    burgersPerPlayer = {},
 }
 
 local function onPlayerAdded(player)
-    Sdk.statePerPlayer[player] = "NONE"
-    Sdk.burgersPerPlayer[player] = 0
+    burgersPerPlayer[player] = 0
+    statePerPlayer[player] = "NONE"
 end
 
 local function onPlayerRemoving(player)
-    Sdk.statePerPlayer[player] = nil 
-    Sdk.burgersPerPlayer[player] = nil
+    burgersPerPlayer[player] = nil
+    statePerPlayer[player] = nil 
 end
 
 local function onTimerTick()
     local gameState = Sdk.gameState
     local killsDuringRound = Sdk.killsDuringRound
-
-    print("Timer:  The game state is current " .. gameState .. ".")
 
     local isIntermission = gameState == "INTERMISSION"
     local isRoundInProgress = gameState == "ROUND_IN_PROGESS"
@@ -61,7 +60,7 @@ local function onTimerTick()
         noMoreSquidwards = true
     end
 
-    if noMoreSquidwards and Sdk.gameState ~= "INTERMISSION" then
+    if noMoreSquidwards and gameState ~= "INTERMISSION" then
         Sdk:changeGameState("INTERMISSION")
 
         noMoreSquidwards = false
@@ -115,29 +114,35 @@ local function onTimerTick()
 end
 
 local function onPrompButtonHoldEnded(prompt, player)
-    local isBurgersPrompt = prompt.Parent.Name == "BurgersPrompt"
-    if isBurgersPrompt then
-        local function addBurgersToPlayerPromise()
-            return Promise.new(function(resolve, reject, onCancel)
-                local playerBurgers = Sdk.burgersPerPlayer[player]
+    local playerBurgers = burgersPerPlayer[player]
 
+    local isBurgersPrompt = prompt.Parent.Name == "BurgersPrompt"
+
+    if isBurgersPrompt then
+
+        local function givePlayerBurgersPromise()   
+            return Promise.new(function(resolve, reject, onCancel)
                 if playerBurgers >= MAX_BURGERS then
                     reject(REJECT_MESSAGE)
                 elseif playerBurgers < MAX_BURGERS then
+        
+                    burgersPerPlayer[player] = 6
+        
                     resolve(RESOLVE_MESSAGE)
                 end
             end)
+        end
+
+        local function onResolve(message)
+            sendNotifictionToPlayer:Fire(player, message)
+            updateBurgersUi:Fire(player, burgersPerPlayer[player])
         end
 
         local function onReject(message)
             sendNotifictionToPlayer:Fire(player, message)
         end
 
-        local function onResolve(message)
-            sendNotifictionToPlayer:Fire(player, message)
-        end
-
-        addBurgersToPlayerPromise()
+        givePlayerBurgersPromise()
         :andThen(onResolve)
         :catch(onReject)
     end
@@ -179,7 +184,7 @@ function Sdk.init()
     -- bindings
     Players.PlayerAdded:Connect(onPlayerAdded)
     Players.PlayerRemoving:Connect(onPlayerRemoving)
-    ProximityPromptService.PromptButtonHoldEnded:Connect(onPrompButtonHoldEnded)
+    ProximityPromptService.PromptTriggered:Connect(onPrompButtonHoldEnded)
     RunService.Heartbeat:Connect(onHeartbeat)
 end
 
