@@ -6,7 +6,7 @@ local Characters = ReplicatedStorage.Characters
 
 local Signal = require(Packages.signal)
 
-local SquidwardModel = require(Characters.Squidward)
+local SquidwardModel = Characters.Squidward
 
 local squidward = {}
 local squidwardPrototype = {}

@@ -8,7 +8,7 @@ local Packages = ReplicatedStorage.Packages
 
 local Squidward = require(Common.SquidwardClass)
 local Timer = require(Packages.timer)
-local Comm = require(Packages.Comm)
+local Comm = require(Packages.comm)
 local Promise = require(Packages.promise)
 
 local serverComm = Comm.ServerComm.new(ReplicatedStorage, "MainComm")
@@ -143,6 +143,7 @@ function Sdk.init()
 
     local timer = Timer.new(TIMER_INTERVAL)
     timer.Tick:Connect(onTimerTick)
+    timer:Start()
 
     -- if any players have already loaded in and server code has been run (edge case)
     for _, player in ipairs(Players:GetChildren()) do
