@@ -104,6 +104,7 @@ end
 
 function Sdk.init()
     updateCountdownUi = serverComm:CreateSignal("UpdateCountdownUi")
+    sendNotifictionToPlayer = serverComm:CreateSignal("SendNotificationToPlayer")
 
     local timer = Timer.new(TIMER_INTERVAL)
     timer.Tick:Connect(onTimerTick)
