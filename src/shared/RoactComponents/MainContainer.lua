@@ -11,6 +11,12 @@ local Notification = require(RoactComponents.Notification)
 
 local MainContainer = Roact.Component:extend("MainContainer")
 
+function MainContainer:init()
+    self.onBurgerButtonActivated = function()
+        self.props.throwBurger:Fire()
+    end
+end
+
 function MainContainer:render()
     local countdownTime = self.props.countdownTime
     local burgersLeft = self.props.burgersLeft
