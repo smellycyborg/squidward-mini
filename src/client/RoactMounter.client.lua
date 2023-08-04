@@ -3,9 +3,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Packages = ReplicatedStorage:WaitForChild("Packages")
 local Common = ReplicatedStorage:WaitForChild("Common")
+local RoactComponents = Common:WaitForChild("RoactComponents")
 
 local Roact = require(Packages:WaitForChild("roact"))
-local MainContainer = require(Common:WaitForChild("MainContainer"))
+local MainContainer = require(RoactComponents:WaitForChild("MainContainer"))
 local Comm = require(Packages.comm)
 
 local clientComm = Comm.ClientComm.new(ReplicatedStorage, false, "MainComm")
