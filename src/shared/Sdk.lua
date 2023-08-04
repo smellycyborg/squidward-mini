@@ -161,4 +161,16 @@ function Sdk:changeGameState(newState)
     Sdk.gameState = newState
 end
 
+function Sdk:clearSquidwardInstances()
+    for _, squidward in Sdk.squidwardInstances do
+        squidward:destroy()
+    end
+
+    table.clear(Sdk.squidwardInstances)
+end
+
+function Sdk:addToKills()
+    Sdk.killsDuringRound += 1
+end
+
 return Sdk
