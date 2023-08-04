@@ -109,9 +109,12 @@ function Sdk.init()
     local timer = Timer.new(TIMER_INTERVAL)
     timer.Tick:Connect(onTimerTick)
 
+    -- if any players have already loaded in and server code has been run (edge case)
     for _, player in ipairs(Players:GetChildren()) do
         task.spawn(onPlayerAdded, player)
     end
+
+    -- bindings
     Players.PlayerAdded:Connect(onPlayerAdded)
     Players.PlayerRemoving:Connect(onPlayerRemoving)
     ProximityPromptService.PromptButtonHoldEnded:Connect(onPrompButtonHoldEnded)
