@@ -3,6 +3,7 @@ local Players = game:GetService("Players")
 
 local Packages = ReplicatedStorage.Packages
 local Characters = ReplicatedStorage.Characters
+local Items = ReplicatedStorage.Items
 
 local Signal = require(Packages.signal)
 
@@ -14,6 +15,13 @@ local squidwardPrivate = {}
 
 local function _getClosestCharacter(modelPosition)
     local distances = {}
+
+    
+    local burgersInTheWorkspace = workspace.Burgers:GetChildren()
+    local burgersExist = next(burgersInTheWorkspace) ~= nil
+    if burgersExist then
+        return burgersInTheWorkspace[math.random(1, #burgersInTheWorkspace)] -- get random burger
+    end
 
 	for _, player in ipairs(Players:GetPlayers()) do
 		local character = player.Character
@@ -94,12 +102,20 @@ function squidwardPrototype:findPath()
     if not closestCharacter then
         return
     end
-    local closestCharacterRootPart = closestCharacter:FindFirstChild("HumanoidRootPart")
-    if not closestCharacterRootPart then
-        return warn("Attempt to index nil with root part.")
+
+    local moveToPosition
+    if closestCharacter.Name == "Burger" then
+        moveToPosition = closestCharacter.Position
+    else
+        local closestCharacterRootPart = closestCharacter:FindFirstChild("HumanoidRootPart")
+        if not closestCharacterRootPart then
+            return warn("Attempt to index nil with root part.")
+        end
+
+        moveToPosition = closestCharacterRootPart.Position
     end
 
-    workspaceModel:MoveTo(closestCharacterRootPart.Position)
+    workspaceModel:MoveTo(moveToPosition)
 end
 
 function squidwardPrototype:addHealth(amount)
