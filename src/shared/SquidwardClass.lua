@@ -1,8 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Packages = ReplicatedStorage.Packages
+local Characters = ReplicatedStorage.Characters
 
 local Signal = require(Packages.signal)
+
+local SquidwardModel = require(Characters.Squidward)
 
 local squidward = {}
 local squidwardPrototype = {}
@@ -20,6 +23,15 @@ function squidward.new()
     squidwardPrivate[self] = private
 
     return setmetatable(self, squidwardPrototype)
+end
+
+function squidwardPrototype:spawn()
+    local private = squidwardPrivate[self]
+
+    local squidwardClone = SquidwardModel:Clone()
+    squidwardClone.Parent = workspace
+
+    private.workspaceModel = squidwardClone
 end
 
 function squidwardPrototype:addHealth(amount)
