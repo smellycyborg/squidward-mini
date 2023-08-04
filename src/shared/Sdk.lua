@@ -91,7 +91,7 @@ local function onPrompButtonHoldEnded(prompt, player)
         local function onReject(message)
             sendNotifictionToPlayer:Fire(player, message)
         end
-        
+
         local function onResolve(message)
             sendNotifictionToPlayer:Fire(player, message)
         end
@@ -104,6 +104,7 @@ end
 
 function Sdk.init()
     updateCountdownUi = serverComm:CreateSignal("UpdateCountdownUi")
+    updateBurgersUi = serverComm:CreateSignal("UpdateBurgersUi")
     sendNotifictionToPlayer = serverComm:CreateSignal("SendNotificationToPlayer")
 
     local timer = Timer.new(TIMER_INTERVAL)

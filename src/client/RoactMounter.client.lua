@@ -11,24 +11,28 @@ local Comm = require(Packages.comm)
 
 local clientComm = Comm.ClientComm.new(ReplicatedStorage, false, "MainComm")
 local updateCountdownUi = clientComm:GetSignal("UpdateCountdownUi")
+local updateBurgersUi = clientComm:GetSignal("UpdateBurgersUi")
 local sendNotifictionToPlayer = clientComm:GetSignal("SendNotificationToPlayer")
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
 local countdownTime = 0
+local burgersLeft = 0
 local notificationMessage = ""
 
 local handle
 
 local view = Roact.createElement(MainContainer, {
     countdownTime = countdownTime,
+    burgersLeft = burgersLeft,
     notificationMessage = notificationMessage,
 })
 
 local function updateHandle()
     Roact.update(handle, Roact.createElement(MainContainer, {
         countdownTime = countdownTime,
+        burgersLeft = burgersLeft,
         notificationMessage = notificationMessage,
     }), playerGui, "MainContainer")
 end
@@ -41,6 +45,14 @@ local function onUpdateCountdownUi(timeLeft)
     updateHandle()
 
     return countdownTime
+end
+
+local function onUpdateBurgersUi(newAmount)
+    burgersLeft = newAmount
+
+    updateHandle()
+
+    return burgersLeft
 end
 
 local function onSendNotificationToPlayer(message)
@@ -59,4 +71,5 @@ end
 
 -- bindings
 updateCountdownUi:Connect(onUpdateCountdownUi)
+updateBurgersUi:Connect(onUpdateBurgersUi)
 sendNotifictionToPlayer:Connect(onSendNotificationToPlayer)

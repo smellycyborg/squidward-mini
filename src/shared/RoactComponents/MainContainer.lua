@@ -6,12 +6,14 @@ local RoactComponents = Common.RoactComponents
 
 local Roact = require(Packages.ReplicatedStorage)
 local Countdown = require(RoactComponents.Countdown)
+local Burgers = require(RoactComponents.Burgers)
 local Notification = require(RoactComponents.Notification)
 
 local MainContainer = Roact.Component:extend("MainContainer")
 
 function MainContainer:render()
     local countdownTime = self.props.countdownTime
+    local burgersLeft = self.props.burgersLeft
     local notificationMessage = self.props.notificationMessage
 
     return Roact.createElement("ScreenGui", {
@@ -27,9 +29,12 @@ function MainContainer:render()
             Countdown = Roact.createElement(Countdown, {
                 countdownTime = countdownTime,
             }),
+            Burgers = Roact.createElement(Burgers, {
+                burgersLeft = burgersLeft,
+            }),
             Notification = Roact.createElement(Notification, {
                 notificationMessage = notificationMessage,
-            })
+            }),
        })
     })
 end
